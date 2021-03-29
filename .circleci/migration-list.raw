@@ -1,0 +1,43 @@
+default: "ricard-io"
+description: "What is the container tag of the contaienr image to delete from ricard-io 's Quay.io Container registry ?"
+        sed -i "s#image: quay.io/ricardio/website:.*#image: quay.io/ricardio/website:${QUAY_OCI_IMAGE_TAG}#g" docker-compose.cms.build.yml
+        # and now [quay.io/ricardio/website:${QUAY_OCI_IMAGE_TAG}] should exists among [docker images]
+        QUAY_BOT_USERNAME=$(secrethub read ${SECRETHUB_ORG}/${SECRETHUB_REPO}/ricard_io_bot/oci/quay-io/user-name)
+        QUAY_BOT_SECRET=$(secrethub read ${SECRETHUB_ORG}/${SECRETHUB_REPO}/ricard_io_bot/oci/quay-io/user-pwd)
+        export OCI_IMAGE_GUN="quay.io/ricardio/website:${QUAY_OCI_IMAGE_TAG}"
+        export CICD_BUILD_TIMESTAMP=$(docker inspect --format '{{ index .Config.Labels "io.ricard-io.cicd.build.timestamp"}}' "${OCI_IMAGE_GUN}")
+        docker tag "quay.io/ricardio/website:${QUAY_OCI_IMAGE_TAG}" "quay.io/ricardio/website:${QUAY_OCI_IMAGE_TAG}-latest"
+        docker push "quay.io/ricardio/website:${QUAY_OCI_IMAGE_TAG}"
+        docker push "quay.io/ricardio/website:${QUAY_OCI_IMAGE_TAG}-latest"
+        # and now [quay.io/ricardio/website:${QUAY_OCI_IMAGE_TAG}] should exists among [docker images]
+        QUAY_BOT_USERNAME=$(secrethub read ${SECRETHUB_ORG}/${SECRETHUB_REPO}/ricard_io_bot/oci/quay-io/user-name)
+        QUAY_BOT_SECRET=$(secrethub read ${SECRETHUB_ORG}/${SECRETHUB_REPO}/ricard_io_bot/oci/quay-io/user-pwd)
+        docker tag "quay.io/ricardio/website:${QUAY_OCI_IMAGE_TAG}" "quay.io/ricardio/website:stable-latest"
+        docker push "quay.io/ricardio/website:${QUAY_OCI_IMAGE_TAG}"
+        docker push "quay.io/ricardio/website:stable-latest"
+
+
+
+
+# The Heroku App ID
+
+
+
+HEROKU_APP_ID: "ricard-io"
+
+# The Docker image
+
+`quay.io/ricardio/website:${QUAY_OCI_IMAGE_TAG}`
+
+# The Circle CI Org Context
+
+`context: ricard-io-cicd`
+
+# The secrets
+
+export SECRETHUB_ORG=ricard-io
+export HEROKU_API_KEY=$(secrethub read "${SECRETHUB_ORG}/${SECRETHUB_REPO}/ricard_io_bot/heroku/api-token")
+
+The Bot Bourne Identity
+
+`ricard_io_bot`

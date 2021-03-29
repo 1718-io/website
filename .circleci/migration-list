@@ -1,0 +1,37 @@
+default: "ricard-io"
+description: "What is the container tag of the contaienr image to delete from ricard-io 's Quay.io Container registry ?"
+        sed -i "s#image: quay.io/ricardio/website:.*#image: quay.io/ricardio/website:${QUAY_OCI_IMAGE_TAG}#g" docker-compose.cms.build.yml
+        # and now [quay.io/ricardio/website:${QUAY_OCI_IMAGE_TAG}] should exists among [docker images]
+        QUAY_BOT_USERNAME=$(secrethub read ${SECRETHUB_ORG}/${SECRETHUB_REPO}/ricard_io_bot/oci/quay-io/user-name)
+        QUAY_BOT_SECRET=$(secrethub read ${SECRETHUB_ORG}/${SECRETHUB_REPO}/ricard_io_bot/oci/quay-io/user-pwd)
+        export OCI_IMAGE_GUN="quay.io/ricardio/website:${QUAY_OCI_IMAGE_TAG}"
+        export CICD_BUILD_TIMESTAMP=$(docker inspect --format '{{ index .Config.Labels "io.ricard-io.cicd.build.timestamp"}}' "${OCI_IMAGE_GUN}")
+        docker tag "quay.io/ricardio/website:${QUAY_OCI_IMAGE_TAG}" "quay.io/ricardio/website:${QUAY_OCI_IMAGE_TAG}-latest"
+        docker push "quay.io/ricardio/website:${QUAY_OCI_IMAGE_TAG}"
+        docker push "quay.io/ricardio/website:${QUAY_OCI_IMAGE_TAG}-latest"
+        # and now [quay.io/ricardio/website:${QUAY_OCI_IMAGE_TAG}] should exists among [docker images]
+        QUAY_BOT_USERNAME=$(secrethub read ${SECRETHUB_ORG}/${SECRETHUB_REPO}/ricard_io_bot/oci/quay-io/user-name)
+        QUAY_BOT_SECRET=$(secrethub read ${SECRETHUB_ORG}/${SECRETHUB_REPO}/ricard_io_bot/oci/quay-io/user-pwd)
+        docker tag "quay.io/ricardio/website:${QUAY_OCI_IMAGE_TAG}" "quay.io/ricardio/website:stable-latest"
+        docker push "quay.io/ricardio/website:${QUAY_OCI_IMAGE_TAG}"
+        docker push "quay.io/ricardio/website:stable-latest"
+  HEROKU_APP_ID: "ricard-io"
+        echo "Checking context variables from [ricard-io-cicd] context"
+        export HEROKU_API_KEY=$(secrethub read "${SECRETHUB_ORG}/${SECRETHUB_REPO}/ricard_io_bot/heroku/api-token")
+        export HEROKU_API_KEY=$(secrethub read "${SECRETHUB_ORG}/${SECRETHUB_REPO}/ricard_io_bot/heroku/api-token")
+        docker pull quay.io/ricardio/website:${QUAY_OCI_IMAGE_TAG}
+        # [quay.io/ricardio/website:${QUAY_OCI_IMAGE_TAG}] should now be among local [docker images]
+      name: "Deploy to Heroku by docker pushing container image, website at https://ricard-io.herokuapp.com/ "
+        export SECRETHUB_ORG=ricard-io
+        export HEROKU_API_KEY=$(secrethub read "${SECRETHUB_ORG}/${SECRETHUB_REPO}/ricard_io_bot/heroku/api-token")
+        docker tag quay.io/ricardio/website:${QUAY_OCI_IMAGE_TAG} registry.heroku.com/${HEROKU_APP_ID}/${HEROKU_PROCESS_TYPE}
+        echo "# submit his work: Docker builds and push the [quay.io/ricardio/website:${QUAY_OCI_IMAGE_TAG}] docker image of"
+        echo "# 1./ command to run the docker compose with the [quay.io/ricardio/website:${QUAY_OCI_IMAGE_TAG}] docker image, to verify the work done by the contributor"
+        echo "# 2./ command to delete the [quay.io/ricardio/website:${QUAY_OCI_IMAGE_TAG}] docker image from Container registry, to clean up Quay.io account (this command will be a curl to launch the Circle CI Pipeline to delete an image)"
+        # and now [quay.io/ricardio/website:${QUAY_OCI_IMAGE_TAG}] should exists among [docker images]
+      context: ricard-io-cicd
+      context: ricard-io-cicd
+      context: ricard-io-cicd
+      context: ricard-io-cicd
+      context: ricard-io-cicd
+      context: ricard-io-cicd
